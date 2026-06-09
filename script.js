@@ -107,7 +107,7 @@ document.getElementById('contact-form').addEventListener('submit', function (e) 
 (function () {
   const slides = document.querySelectorAll('.carousel-slide');
   const dots   = document.querySelectorAll('.carousel-dot');
-  if (!slides.length) return;
+  if (slides.length <= 1) return;
 
   let current = 0;
   let timer;
@@ -136,9 +136,65 @@ document.getElementById('contact-form').addEventListener('submit', function (e) 
   start();
 })();
 
+// ── Experience accordion ──────────────────────────────────
+document.querySelectorAll('.tl-card').forEach(card => {
+  const header = card.querySelector('.tl-header');
+  const bullets = card.querySelector('.tl-bullets');
+  const tags    = card.querySelector('.tl-tags');
+  const item    = card.closest('.tl-item');
+
+  // Wrap bullets + tags in a collapsible body
+  const body = document.createElement('div');
+  body.className = 'tl-body';
+  card.insertBefore(body, bullets);
+  body.appendChild(bullets);
+  if (tags) body.appendChild(tags);
+
+  // Add chevron toggle button to header
+  const btn = document.createElement('button');
+  btn.className = 'tl-toggle';
+  btn.setAttribute('aria-expanded', 'false');
+  btn.setAttribute('aria-label', 'Show details');
+  btn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+  header.appendChild(btn);
+
+  // Toggle on card click
+  card.addEventListener('click', () => {
+    const expanded = item.classList.toggle('expanded');
+    btn.setAttribute('aria-expanded', String(expanded));
+    btn.setAttribute('aria-label', expanded ? 'Hide details' : 'Show details');
+  });
+});
+
+// ── Experience overlay ────────────────────────────────────
+const expSection = document.getElementById('experience');
+const expClose   = document.getElementById('experience-close');
+
+function openExperience(e) {
+  if (e) e.preventDefault();
+  expSection.classList.add('experience-open');
+  document.body.style.overflow = 'hidden';
+  expSection.scrollTop = 0;
+}
+function closeExperience() {
+  expSection.classList.remove('experience-open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('a[href="#experience"]').forEach(a => {
+  a.addEventListener('click', openExperience);
+});
+if (expClose) expClose.addEventListener('click', closeExperience);
+
+// Close on Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeExperience();
+});
+
 // ── Smooth scroll for anchor links ───────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function (e) {
+    if (this.getAttribute('href') === '#experience') return; // handled by overlay
     const target = document.querySelector(this.getAttribute('href'));
     if (target) {
       e.preventDefault();

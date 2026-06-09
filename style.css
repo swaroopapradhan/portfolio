@@ -390,6 +390,24 @@ ul { list-style: none; }
 }
 .interest-tag i { color: var(--blue); }
 
+.about-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.about-photo {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.about-photo img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
 .about-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -429,6 +447,39 @@ ul { list-style: none; }
   line-height: 1.4;
   text-align: center;
 }
+
+/* ─── EXPERIENCE OVERLAY ────────────────────────────────── */
+#experience {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  overflow-y: auto;
+  background: var(--bg-alt);
+  padding-top: var(--nav-h);
+}
+#experience.experience-open { display: block; }
+
+.experience-close {
+  position: fixed;
+  top: calc(var(--nav-h) + 16px);
+  right: 28px;
+  z-index: 502;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--text);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  transition: background var(--transition);
+}
+.experience-close:hover { background: var(--blue); }
 
 /* ─── TIMELINE ──────────────────────────────────────────── */
 .timeline {
@@ -474,14 +525,45 @@ ul { list-style: none; }
   border-color: rgba(69,71,234,.25);
   transform: translateX(4px);
 }
+.tl-card { cursor: pointer; }
 .tl-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 0;
   flex-wrap: wrap;
 }
+.tl-item.expanded .tl-header { margin-bottom: 16px; }
+.tl-toggle {
+  background: none;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  margin-left: auto;
+  align-self: center;
+}
+.tl-toggle:hover { border-color: var(--blue); color: var(--blue); }
+.tl-item.expanded .tl-toggle {
+  transform: rotate(180deg);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.tl-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.tl-item.expanded .tl-body { max-height: 700px; }
 .tl-title-group h3 {
   font-size: 1.05rem;
   font-weight: 700;
