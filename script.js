@@ -186,15 +186,105 @@ document.querySelectorAll('a[href="#experience"]').forEach(a => {
 });
 if (expClose) expClose.addEventListener('click', closeExperience);
 
-// Close on Escape key
+
+// ── Skills overlay ────────────────────────────────────────
+const skillsSection = document.getElementById('skills');
+const skillsClose   = document.getElementById('skills-close');
+
+function openSkills(e) {
+  if (e) e.preventDefault();
+  skillsSection.classList.add('skills-open');
+  document.body.style.overflow = 'hidden';
+  skillsSection.scrollTop = 0;
+}
+function closeSkills() {
+  skillsSection.classList.remove('skills-open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('a[href="#skills"]').forEach(a => {
+  a.addEventListener('click', openSkills);
+});
+if (skillsClose) skillsClose.addEventListener('click', closeSkills);
+
+
+// ── Certifications overlay ────────────────────────────────
+const certSection = document.getElementById('certifications');
+const certClose   = document.getElementById('cert-close');
+
+function openCertifications(e) {
+  if (e) e.preventDefault();
+  certSection.classList.add('cert-open');
+  document.body.style.overflow = 'hidden';
+  certSection.scrollTop = 0;
+}
+function closeCertifications() {
+  certSection.classList.remove('cert-open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('a[href="#certifications"]').forEach(a => {
+  a.addEventListener('click', openCertifications);
+});
+if (certClose) certClose.addEventListener('click', closeCertifications);
+
+// ── Client Journey overlay ────────────────────────────────
+const cjSection = document.getElementById('client-journey');
+const cjClose   = document.getElementById('cj-close');
+
+function openClientJourney(e) {
+  if (e) e.preventDefault();
+  cjSection.classList.add('cj-open');
+  document.body.style.overflow = 'hidden';
+  cjSection.scrollTop = 0;
+}
+function closeClientJourney() {
+  cjSection.classList.remove('cj-open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('a[href="#client-journey"]').forEach(a => {
+  a.addEventListener('click', openClientJourney);
+});
+if (cjClose) cjClose.addEventListener('click', closeClientJourney);
+
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeExperience();
+  if (e.key === 'Escape') { closeAllOverlays(); }
+});
+
+// ── Brand logo: close all overlays and go home ───────────
+function closeAllOverlays() {
+  closeSkills();
+  closeExperience();
+  closeClientJourney();
+  closeCertifications();
+}
+
+document.querySelector('.nav-brand').addEventListener('click', (e) => {
+  e.preventDefault();
+  closeAllOverlays();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Also close all overlays when any nav link is clicked
+document.querySelectorAll('.nav-links a').forEach(link => {
+  link.addEventListener('click', () => {
+    // Only close overlays not targeted by this link
+    const href = link.getAttribute('href');
+    if (href !== '#skills') closeSkills();
+    if (href !== '#experience') closeExperience();
+    if (href !== '#client-journey') closeClientJourney();
+    if (href !== '#certifications') closeCertifications();
+  });
 });
 
 // ── Smooth scroll for anchor links ───────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function (e) {
+    if (this.getAttribute('href') === '#skills') return; // handled by overlay
     if (this.getAttribute('href') === '#experience') return; // handled by overlay
+    if (this.getAttribute('href') === '#client-journey') return; // handled by overlay
+    if (this.getAttribute('href') === '#certifications') return; // handled by overlay
     const target = document.querySelector(this.getAttribute('href'));
     if (target) {
       e.preventDefault();
