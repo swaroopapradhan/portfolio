@@ -3,9 +3,21 @@ const navbar = document.getElementById('navbar');
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-links a');
 
+let lastScrollY = 0;
+
 window.addEventListener('scroll', () => {
-  // Sticky style
-  if (window.scrollY > 40) {
+  const currentY = window.scrollY;
+
+  // Hide on scroll down, reveal on scroll up
+  if (currentY > lastScrollY && currentY > 80) {
+    navbar.classList.add('nav-hidden');
+  } else {
+    navbar.classList.remove('nav-hidden');
+  }
+  lastScrollY = currentY;
+
+  // Shadow when scrolled
+  if (currentY > 40) {
     navbar.classList.add('scrolled');
   } else {
     navbar.classList.remove('scrolled');
@@ -14,7 +26,7 @@ window.addEventListener('scroll', () => {
   // Active link highlighting
   let current = '';
   sections.forEach(section => {
-    if (window.scrollY >= section.offsetTop - 120) {
+    if (currentY >= section.offsetTop - 120) {
       current = section.getAttribute('id');
     }
   });
@@ -27,7 +39,7 @@ window.addEventListener('scroll', () => {
 
   // Back to top
   const btt = document.getElementById('back-to-top');
-  if (window.scrollY > 400) {
+  if (currentY > 400) {
     btt.classList.add('visible');
   } else {
     btt.classList.remove('visible');
@@ -175,6 +187,7 @@ function openExperience(e) {
   expSection.classList.add('experience-open');
   document.body.style.overflow = 'hidden';
   expSection.scrollTop = 0;
+  navbar.classList.remove('nav-hidden');
 }
 function closeExperience() {
   expSection.classList.remove('experience-open');
@@ -258,11 +271,13 @@ function closeAllOverlays() {
   closeExperience();
   closeClientJourney();
   closeCertifications();
+  if (typeof closeWorkOverlay === 'function') closeWorkOverlay();
 }
 
 document.querySelector('.nav-brand').addEventListener('click', (e) => {
   e.preventDefault();
   closeAllOverlays();
+  navbar.classList.remove('nav-hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
@@ -285,12 +300,62 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     if (this.getAttribute('href') === '#experience') return; // handled by overlay
     if (this.getAttribute('href') === '#client-journey') return; // handled by overlay
     if (this.getAttribute('href') === '#certifications') return; // handled by overlay
-    const target = document.querySelector(this.getAttribute('href'));
+    if (this.getAttribute('href') === '#work') return; // handled by work overlay
+    const href = this.getAttribute('href');
+    // Handle internal nav within work overlay
+    if (href && href.startsWith('#wo-')) {
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return;
+    }
+    const target = document.querySelector(href);
     if (target) {
       e.preventDefault();
-      const offset = 72; // navbar height
+      const offset = 72;
       const top = target.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: 'smooth' });
     }
   });
 });
+
+// ── View My Work overlay ──────────────────────────────────
+const workOverlay = document.getElementById('work-overlay');
+const workClose   = document.getElementById('work-close');
+
+function openWorkOverlay(e) {
+  if (e) e.preventDefault();
+  closeAllOverlays();
+  workOverlay.classList.add('work-overlay-open');
+  document.body.style.overflow = 'hidden';
+  workOverlay.scrollTop = 0;
+}
+function closeWorkOverlay() {
+  workOverlay.classList.remove('work-overlay-open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('a[href="#work"], .js-open-work').forEach(a => {
+  a.addEventListener('click', openWorkOverlay);
+});
+if (workClose) workClose.addEventListener('click', closeWorkOverlay);
+
+// "Get in Touch" inside overlay: close overlay then scroll to contact
+document.querySelectorAll('.js-close-work-go-contact').forEach(a => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeWorkOverlay();
+    setTimeout(() => {
+      const contact = document.getElementById('contact');
+      if (contact) {
+        const top = contact.getBoundingClientRect().top + window.scrollY - 72;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }, 450);
+  });
+});
+
+// (Escape key handled by the existing keydown listener via closeAllOverlays)
+
